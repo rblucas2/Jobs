@@ -7,7 +7,7 @@ import { botao, cfg, el, estado, mut, mutAsync, toast } from "./comum.js";
 import { clientIdGoogle } from "./vagas.js";
 
 const linhas = (t) => String(t || "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
-const titulo = (t) => el("div", { class: "section-title", text: t });
+const titulo = (t) => el("div", { class: "section", style: "margin-top:22px", text: t });
 const nota = (t, html) => el("p", { class: "tiny muted", style: "margin:0 0 4px", [html ? "html" : "text"]: t });
 
 function exemploDocumento() {
@@ -93,7 +93,7 @@ export function abrirDefinicoes(aplicarTema, instalar) {
     try { Store.importAll(JSON.parse(await f.text())); toast("Dados importados ✓"); } catch (e) { toast("Ficheiro inválido."); }
   });
 
-  UI.sheet("Definições", [
+  const folha = UI.sheet("Definições", [
     titulo("Aparência"), tema,
     el("button", { class: "btn btn-soft btn-block", text: "Instalar app no dispositivo", onclick: instalar }),
 
@@ -108,13 +108,13 @@ export function abrirDefinicoes(aplicarTema, instalar) {
       Store.update("sys", (x) => { x.sync = s; }); Sync.reload(); toast("Sincronização ligada ✓");
     }, "btn btn-primary btn-block"),
     botao("↻ Sincronizar agora", async () => { if (!Sync.enabled) throw new Error("Ligue a sincronização primeiro."); Sync.flushAllPending(); await new Promise((r) => setTimeout(r, 400)); await Sync.pullAll(); toast("Sincronizado ✓"); }, "btn btn-block"),
-    el("details", { class: "card" }, [el("summary", { style: "cursor:pointer;font-weight:600", text: "Como ativar (se ainda não usa nas outras apps)" }),
+    el("details", { class: "card tint" }, [el("summary", { text: "Como ativar (se ainda não usa nas outras apps)" }),
       el("ol", { class: "tiny muted", style: "line-height:1.7;padding-left:18px" }, [
         el("li", { html: 'Conta grátis em <a class="link" href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a> e um projeto.' }),
         el("li", { text: "SQL Editor → cole o código abaixo → RUN." }),
         el("li", { text: "Project Settings → API: copie o Project URL e a chave anon public." }),
         el("li", { text: "Use o MESMO código de sincronização no telemóvel e no PC." })]),
-      el("pre", { class: "tiny", style: "white-space:pre-wrap;background:var(--surface-2);padding:12px;border-radius:10px", text: Sync.sqlSchema })]),
+      el("pre", { text: Sync.sqlSchema })]),
 
     titulo("Gmail (M0 e recolha)"),
     nota("Usa o mesmo projeto Google Cloud que o Google Calendar do Vida OS: ative também a Gmail API. A autorização é pedida no browser e dura cerca de 1 hora; depois volta a pedir."),
@@ -137,7 +137,7 @@ export function abrirDefinicoes(aplicarTema, instalar) {
     descobertos,
     nota("Remetentes dos alertas por fonte — confirme-os a partir dos primeiros alertas (botão acima). Não são assumidos à partida."),
     ...FONTES.map((f) => remet[f]), padroesOutras,
-    el("label", { class: "row tiny", style: "gap:8px" }, [arquivar, el("span", { text: "Etiquetar e arquivar também os alertas antigos" })]),
+    el("label", { class: "check" }, [arquivar, el("span", { text: "Etiquetar e arquivar também os alertas antigos" })]),
     botao("Criar etiquetas Vagas/* e filtros", async () => {
       guardarGmail();
       const rel = await mutAsync(async (s, cc) => gmail.configurar(gmail.apiReal(cc.gmail.client_id), cc, { arquivar: arquivar.checked }));
@@ -146,22 +146,22 @@ export function abrirDefinicoes(aplicarTema, instalar) {
     }, "btn btn-block"),
 
     titulo("Alvos"), areas, locs,
-    el("label", { class: "row tiny", style: "gap:8px" }, [remoto, el("span", { text: "Aceito trabalho remoto" })]),
+    el("label", { class: "check" }, [remoto, el("span", { text: "Aceito trabalho remoto" })]),
     titulo("Grelha de compatibilidade"),
     nota("A pontuação mede a adequação ao perfil pedido na vaga. Não é uma probabilidade de contratação."),
     el("div", { class: "grid-2", style: "gap:8px" }, DIMENSOES.map((d) => pesos[d])), limite,
 
     titulo("Modelo local (Ollama) — opcional, só no PC"),
     nota('Sem Ollama (ou no telemóvel), a pontuação e o CV funcionam por regras. Para o ativar no PC: instale o Ollama, corra <code>ollama pull qwen3:8b</code> e defina a variável <code>OLLAMA_ORIGINS=' + location.origin + "</code> antes de o iniciar (ver README).", true),
-    el("label", { class: "row tiny", style: "gap:8px" }, [ollAtivo, el("span", { text: "Usar o modelo local quando disponível" })]),
+    el("label", { class: "check" }, [ollAtivo, el("span", { text: "Usar o modelo local quando disponível" })]),
     ollHost, ollModelo,
-    el("label", { class: "row tiny", style: "gap:8px" }, [prelimLLM, el("span", { text: "Usar também nas pontuações preliminares (mais lento)" })]),
+    el("label", { class: "check" }, [prelimLLM, el("span", { text: "Usar também nas pontuações preliminares (mais lento)" })]),
     botao("Testar ligação", async () => { mut((s, cc) => Object.assign(cc.ollama, { ativo: ollAtivo.checked, host: ollHost.input.value.trim(), modelo: ollModelo.input.value.trim() })); const [ok, msg] = await llm.estado(cfg()); toast(msg, 5000); if (!ok) console.warn(msg); }, "btn btn-block"),
 
     titulo("CV, carta e tracker"), idioma, maxPontos, abertura, fecho, dias, sep,
     titulo("Formato do CV"),
     nota("O formato é fixo e é o mesmo no Word e no PDF. Aprove-o uma vez; sem aprovação não há exportação."),
-    el("div", { class: "doc-wrap" }, [el("style", { text: cvM.CSS_DOCUMENTO }), el("div", { html: cvM.htmlDocumento(exemploDocumento()) })]),
+    el("div", { class: "doc-wrap", style: "padding:22px 24px;font-size:90%" }, [el("style", { text: cvM.CSS_DOCUMENTO }), el("div", { html: cvM.htmlDocumento(exemploDocumento()) })]),
     c.cv.modelo_aprovado
       ? botao("Formato aprovado ✓ — retirar aprovação", () => { mut((s, cc) => { cc.cv.modelo_aprovado = false; }); toast("Aprovação retirada."); }, "btn btn-ghost btn-block")
       : botao("Aprovar este formato", () => { mut((s, cc) => { cc.cv.modelo_aprovado = true; }); toast("Formato aprovado ✓"); }, "btn btn-soft btn-block"),
