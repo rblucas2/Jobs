@@ -1,20 +1,10 @@
-# Credenciais e tokens do Gmail — nunca vão para o repositório
-credentials.json
-token.json
-client_secret*.json
+# Dependências só de desenvolvimento (testes)
+node_modules/
 
-# Dados pessoais: base de dados, perfil-base, CVs gerados, exportações
-data/*
-!data/.gitkeep
+# Cópias de segurança exportadas da app (contêm dados pessoais)
+*backup*.json
+jobs-*.json
 
-# Registos
-logs/*
-!logs/.gitkeep
-
-# Python
-__pycache__/
-*.pyc
-.venv/
-venv/
-.pytest_cache/
-.streamlit/secrets.toml
+# Sistema
+.DS_Store
+Thumbs.db

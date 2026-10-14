@@ -1,0 +1,13 @@
+{
+  "name": "jobs",
+  "private": true,
+  "type": "module",
+  "description": "Procura de Emprego — PWA (testes automáticos da lógica)",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "docx": "8.5.0",
+    "linkedom": "0.18.5"
+  }
+}

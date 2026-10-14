@@ -1,0 +1,15 @@
+{
+  "name": "Procura de Emprego",
+  "short_name": "Emprego",
+  "description": "Vagas dos alertas do Gmail, compatibilidade com o perfil, CV adaptado só com dados reais e tracker de candidaturas.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f6f6f4",
+  "theme_color": "#3b5bdb",
+  "icons": [
+    { "src": "icons/jobs.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
