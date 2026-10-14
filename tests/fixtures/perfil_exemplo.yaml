@@ -1,0 +1,73 @@
+# PERFIL FICTÍCIO — usado apenas nos testes automáticos. Não corresponde a uma pessoa real.
+dados_pessoais:
+  nome: Pessoa Exemplo
+  email: exemplo@example.com
+  telefone: "+351 900 000 000"
+  localizacao: Lisboa
+  linkedin: ""
+resumo:
+  - id: resumo_01
+    texto: Analista financeiro com experiência em controlo de gestão e reporting no retalho.
+    tipo: resumo
+experiencia:
+  - id: exp_intermarche
+    cargo: Analista de Controlo de Gestão
+    empresa: Intermarché
+    local: Lisboa
+    data_inicio: "2021-09"
+    data_fim: atual
+    itens:
+      - id: exp_intermarche_01
+        texto: Elaboração do reporting mensal de vendas e margens para 45 lojas, em Excel e Power BI.
+        tipo: responsabilidade
+      - id: exp_intermarche_02
+        texto: Redução de 15% no tempo de fecho mensal através da automatização de relatórios em VBA.
+        tipo: resultado
+      - id: exp_intermarche_03
+        texto: Análise de desvios orçamentais com um volume de 1.500 artigos por trimestre.
+        tipo: responsabilidade
+  - id: exp_auditora
+    cargo: Estagiário de Auditoria
+    empresa: Auditora Exemplo, SROC
+    local: Porto
+    data_inicio: "2020-02"
+    data_fim: "2021-07"
+    itens:
+      - id: exp_auditora_01
+        texto: Apoio a trabalhos de auditoria financeira de 8 clientes do setor industrial.
+        tipo: responsabilidade
+      - id: exp_auditora_02
+        texto: Preparação de papéis de trabalho segundo as normas IFRS.
+        tipo: responsabilidade
+formacao:
+  - id: form_nova_sbe
+    grau: Mestrado em Finanças
+    instituicao: Universidade Exemplo
+    data_inicio: "2018-09"
+    data_fim: "2020-06"
+    itens: []
+competencias:
+  - id: comp_excel
+    nome: Excel
+    categoria: ferramenta
+    nivel: avançado
+  - id: comp_power_bi
+    nome: Power BI
+    categoria: ferramenta
+    nivel: intermédio
+  - id: comp_vba
+    nome: VBA
+    categoria: ferramenta
+    nivel: ""
+  - id: comp_sql
+    nome: SQL
+    categoria: ferramenta
+    nivel: básico
+linguas:
+  - id: ling_portugues
+    nome: Português
+    nivel: nativo
+  - id: ling_ingles
+    nome: Inglês
+    nivel: C1
+certificacoes: []
