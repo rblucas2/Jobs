@@ -1,0 +1,33 @@
+/* Estilos próprios da app de emprego (o resto vem de shared/base.css, igual às apps Vida OS). */
+:root { --accent: #3b5bdb; --accent-2: #5f3dc4; --accent-soft: #e7ecfd; --on-accent: #fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --accent: #6f8cff; --accent-soft: #1d2647; } }
+:root[data-theme="dark"] { --accent: #6f8cff; --accent-soft: #1d2647; }
+
+.score { flex: none; width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-family: var(--font-num); font-variant-numeric: tabular-nums; color: #fff; background: var(--text-mute); }
+.score.alta { background: var(--good); } .score.media { background: var(--warn); } .score.baixa { background: var(--bad); }
+.score.prelim { opacity: .72; outline: 2px dashed rgba(255,255,255,.7); outline-offset: -5px; }
+.tag { display: inline-block; font-size: .7rem; font-weight: 650; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--text-soft); margin-right: 4px; }
+.tag.bad { background: color-mix(in srgb, var(--bad) 16%, transparent); color: var(--bad); }
+.tag.good { background: color-mix(in srgb, var(--good) 16%, transparent); color: var(--good); }
+.tag.warn { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
+.alerta { border-left: 4px solid var(--bad); }
+.aviso { border-left: 4px solid var(--warn); }
+.wrap { white-space: normal !important; }
+.diff ins { background: color-mix(in srgb, var(--good) 26%, transparent); text-decoration: none; border-radius: 3px; }
+.diff del { background: color-mix(in srgb, var(--bad) 22%, transparent); border-radius: 3px; }
+.lado { display: grid; grid-template-columns: 1fr; gap: 6px 16px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.lado:last-child { border-bottom: 0; }
+.lado .origem { color: var(--text-soft); font-size: .86rem; }
+.lado .origem::before { content: "Origem: "; font-weight: 650; }
+@media (min-width: 760px) { .lado { grid-template-columns: 1fr 1fr; } .lado .origem::before { content: ""; } }
+.motivos { color: var(--bad); font-size: .8rem; margin: 4px 0 0 16px; padding: 0; }
+.ids { font-family: var(--mono); font-size: .72rem; color: var(--text-mute); }
+.doc-wrap { background: #fff; border-radius: var(--r-sm); padding: 22px 26px; overflow: auto; border: 1px solid var(--border); }
+.ponto-ed { border: 1px solid var(--border); border-radius: var(--r-sm); padding: 10px; margin-top: 8px; }
+.ponto-ed textarea { min-height: 64px; }
+.dim { display: grid; grid-template-columns: 1fr 42px 46px; gap: 8px; align-items: center; margin: 6px 0; font-size: .86rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips .pill { cursor: pointer; }
+textarea { font: inherit; }
+.topbar .sub { text-transform: none; }

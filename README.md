@@ -1,148 +1,130 @@
 # Procura de Emprego
 
-Aplicação local e gratuita que recolhe vagas dos alertas de emprego no Gmail, as ordena pela
-compatibilidade com o seu perfil, gera CVs adaptados **apenas com dados reais** e regista as
-candidaturas. A submissão das candidaturas é sempre manual. Especificação completa: [SPEC.md](SPEC.md).
+App instalável (PWA), igual em estilo e funcionamento às apps Vida OS: abre no telemóvel e no PC,
+funciona offline e fica sincronizada entre os dois através do seu Supabase (gratuito).
+Recolhe vagas dos alertas do Gmail, ordena-as pela compatibilidade com o seu perfil, gera CVs
+adaptados **só com dados reais** e regista as candidaturas. A submissão é sempre manual.
+Especificação: [SPEC.md](SPEC.md) (inclui as adaptações feitas para o formato de app web).
 
-> Os dados (perfil, CVs, base de dados, e-mails) e as credenciais do Gmail ficam no seu computador e
-> estão no `.gitignore`: `credentials.json`, `token.json`, `data/` e `logs/` nunca vão para o repositório.
+Tudo é HTML/CSS/JS puro, sem servidor próprio e sem custos.
 
-## Instalação (Windows ou Mac)
+## Pôr online (GitHub Pages)
 
-1. **Python 3.11 ou superior** — https://www.python.org/downloads/ (no Windows, marque *Add Python to PATH*).
-2. Abra um terminal na pasta do repositório (`jobs`) e crie um ambiente virtual:
+1. **O repositório tem de ser público** para o GitHub Pages ser gratuito (num repositório privado
+   o Pages exige um plano pago). Os seus dados **não** ficam no repositório: ficam no dispositivo e no
+   seu Supabase. O repositório só tem código e um perfil fictício usado nos testes.
+   → Settings → General → Danger Zone → *Change visibility* → Public.
+2. Settings → Pages → *Deploy from a branch* → `main` / `(root)` → Save.
+3. Em cerca de 1 minuto fica em `https://<utilizador>.github.io/<repositório>/`
+   (ex.: `https://rblucas2.github.io/Jobs/`).
 
-   ```bash
-   python -m venv .venv
-   # Windows:  .venv\Scripts\activate
-   # Mac:      source .venv/bin/activate
-   pip install -r requirements.txt
-   ```
+Fica na mesma origem que as apps Vida OS (`<utilizador>.github.io`), por isso aproveita a configuração
+de sincronização e o Client ID do Google que já lá tiver.
 
-3. **LibreOffice** (opcional, para exportar PDF) — https://www.libreoffice.org/. Sem ele, a app exporta só Word.
-4. **Ollama** (opcional, modelo local) — https://ollama.com. Depois: `ollama pull qwen3:8b`
-   (ou outro modelo de 7–8B; confirme o mais recente e o desempenho no seu PC — cerca de 16 GB de RAM
-   é a referência aproximada). Sem Ollama, a app funciona em **modo por regras**: a pontuação usa
-   palavras-chave e o CV é montado com o texto do perfil-base, para reformular à mão.
-5. Arranque a app:
+## Instalar no telemóvel / PC
 
-   ```bash
-   streamlit run app.py
-   ```
+- **Android/Chrome:** menu ⋮ → “Instalar app” / “Adicionar ao ecrã principal”.
+- **iPhone/Safari:** Partilhar → “Adicionar ao ecrã principal”.
+- **PC (Chrome/Edge):** ícone de instalar na barra de endereço.
 
-   Abre em http://localhost:8501. A página **Início** mostra o que falta configurar.
+## Sincronização telemóvel ↔ PC
 
-## Configurar o Gmail (uma vez, gratuito)
+Se já usa a sincronização nas apps Vida OS, **não precisa de fazer nada**: esta app usa o mesmo Supabase
+e o mesmo código, numa linha própria (`app = "jobs"`). Caso contrário: ⚙︎ Definições → Sincronização
+(os passos e o SQL estão na própria app). O merge é sem perdas e, se o mesmo item for alterado nos dois
+dispositivos, fica a alteração mais recente desse item.
 
-1. Em https://console.cloud.google.com crie um projeto.
-2. Ative a **Gmail API** (APIs e serviços → Biblioteca → Gmail API → Ativar).
-3. Configure o ecrã de consentimento OAuth (tipo *Externo*, estado *Teste*) e adicione o seu e-mail
-   como **utilizador de teste**.
-4. Crie credenciais **ID de cliente OAuth → Aplicação de ambiente de trabalho**, descarregue o JSON e
-   guarde-o como `credentials.json` na pasta do repositório.
-5. Descubra os remetentes dos seus alertas (a app não os assume à partida):
+## Ligar o Gmail (uma vez)
 
-   ```bash
-   python setup_gmail.py --descobrir
-   ```
+Usa o mesmo projeto Google Cloud do Google Calendar do Vida OS:
 
-   Copie os endereços certos para `gmail.remetentes` no `config.yaml` (ou na página **Definições**).
-6. Crie as etiquetas `Vagas/*`, os filtros e arquive os alertas antigos:
+1. Em https://console.cloud.google.com → APIs e serviços → Biblioteca → **Gmail API** → Ativar.
+2. No ecrã de consentimento OAuth, em *Data access*, acrescente os âmbitos `gmail.modify` e
+   `gmail.settings.basic`. Com a app em modo *Teste*, o seu e-mail tem de estar em *Test users*.
+3. Na credencial **OAuth client ID (Web application)**, em *Authorized JavaScript origins*, tem de estar
+   `https://<utilizador>.github.io` (se o Calendar já funciona, já está).
+4. Na app: ⚙︎ → Gmail → cole o Client ID (vem preenchido se já o tiver no Vida OS) → **Ligar Gmail**.
+5. **Descobrir remetentes** → escolha a fonte de cada endereço → **Gravar definições**.
+6. **Criar etiquetas Vagas/\* e filtros** (pode repetir: não cria duplicados).
 
-   ```bash
-   python setup_gmail.py
-   ```
+A autorização do Google no browser dura cerca de 1 hora; depois a app volta a pedi-la quando precisar.
 
-   Pode repetir o comando sempre que alterar os remetentes: não cria duplicados.
+## Modelo local (opcional, só no PC)
 
-Notas:
-- Permissões pedidas: `gmail.modify` (ler e etiquetar) e `gmail.settings.basic` (criar filtros).
-- Com o projeto em modo *Teste*, a Google faz expirar a autorização ao fim de alguns dias (7, segundo a
-  documentação da Google consultada até 2025). Quando isso acontecer, a app volta a abrir o browser para
-  autorizar. Não precisa de publicar a app.
-- Alternativa manual: criar a etiqueta e o filtro no Gmail em Definições → Filtros.
+Sem modelo, a pontuação e o CV funcionam **por regras** (no telemóvel é sempre assim). No PC pode usar
+o [Ollama](https://ollama.com):
 
-## Primeira utilização
+```bash
+ollama pull qwen3:8b            # ou outro modelo de 7–8B; confirme o mais recente e o desempenho no seu PC
+# Permitir que a app (no GitHub Pages) fale com o Ollama:
+#   Windows (PowerShell):  setx OLLAMA_ORIGINS "https://rblucas2.github.io"   e reinicie o Ollama
+#   Mac:                   launchctl setenv OLLAMA_ORIGINS "https://rblucas2.github.io"   e reinicie o Ollama
+```
 
-1. **Perfil-base** → importe o CV atual (PDF/Word). A app propõe um perfil com IDs estáveis
-   (ex.: `exp_intermarche_03`) e assinala os itens que não encontrou literalmente no CV. Reveja, edite
-   e **valide**. Só a versão validada é usada nos CVs; qualquer alteração cria uma versão nova.
-2. **Definições** → confirme áreas e localizações-alvo, pesos da grelha e **aprove o modelo Word**
-   (`templates/cv_modelo.docx`, que pode personalizar no Word mantendo os nomes dos estilos).
+Depois: ⚙︎ → Modelo local → ativar → **Testar ligação**. O browser pode pedir autorização para aceder a
+dispositivos na rede local.
 
 ## Fluxo diário (≈15 min)
 
 1. Os alertas chegam ao Gmail e o filtro envia-os para `Vagas/*`, fora da caixa de entrada.
-2. **Vagas** → *Recolher novas vagas*: lê, deduplica, guarda e pontua (preliminar, marcada com \*).
-3. Nas vagas de interesse, **Detalhe da vaga** → cole a descrição completa → pontuação final.
-4. *Gerar CV adaptado* → **Revisão de CV**: original vs. adaptado lado a lado, origem de cada ponto,
-   pontos "não verificados" bloqueados. Edite, confirme e aprove; depois exporte Word/PDF.
+2. **Vagas** → *Recolher do Gmail*: lê, deduplica, guarda e pontua (preliminar, com borda tracejada).
+3. Numa vaga de interesse, **Vaga** → cole a descrição completa → *Guardar e analisar*.
+4. *Gerar CV adaptado* → **CV**: original vs. adaptado, origem de cada ponto, pontos não verificados
+   bloqueados. Edite, confirme e aprove; descarregue o Word ou o PDF.
 5. Candidate-se **manualmente** na plataforma.
-6. **Tracker** → marque *Candidatado*; o follow-up fica agendado (10 dias por defeito).
-   Exporte o CSV para o Power BI quando quiser.
+6. **Tracker** → marque *Candidatado*; o follow-up fica agendado (10 dias por defeito). Exporte o CSV
+   para o Power BI quando quiser.
 
-## Como a ferramenta garante dados reais no CV
+## Como a app garante dados reais no CV
 
-O validador (`src/cv/validador.py`) corre sempre antes de um CV ser mostrado, a cada edição, na
-aprovação e na exportação. Um ponto fica **não verificado** (e o CV não pode ser aprovado) se:
+O validador (`js/validador.js`) corre sempre antes de mostrar um CV, a cada edição, na aprovação e na
+exportação. Um ponto fica **não verificado** (e o CV não pode ser aprovado) se:
 
 - não tiver `source_ids`, ou citar um ID inexistente;
 - citar itens de outra experiência, ou uma competência num ponto de experiência (o que acrescentaria
-  o facto "usei X neste cargo");
+  o facto “usei X neste cargo”);
 - tiver um número, data ou percentagem que não exista nos itens citados (inclui números por extenso,
-  "mil", "milhões", "50k", "2M€");
+  “mil”, “milhões”, “50k”, “2M€”);
 - mencionar uma ferramenta, certificação, competência ou língua ausente dos itens citados;
-- usar termos quantitativos ou de distinção ausentes da origem ("duplicou", "melhor", "prémio", "todos"…);
+- usar termos quantitativos ou de distinção ausentes da origem (“duplicou”, “melhor”, “prémio”, “todos”…);
 - mencionar um nome próprio ou sigla ausente da origem (empresa, cliente, norma).
 
-Única exceção: no resumo, "N anos de experiência" é aceite se N não exceder os anos calculados a partir
-das datas do perfil. O validador é deliberadamente conservador: prefere bloquear um ponto legítimo
-(que corrige à mão) a deixar passar um facto que não está no perfil. Os cabeçalhos (cargo, empresa,
-datas, formação, línguas) nunca são escritos pelo modelo: vêm diretamente do perfil-base.
+Única exceção: no resumo, “N anos de experiência” é aceite se N não exceder os anos calculados a partir
+das datas do perfil. Os cabeçalhos (cargo, empresa, datas, formação, línguas) nunca são escritos pelo
+modelo: vêm do perfil-base. O validador é conservador de propósito: prefere bloquear um ponto legítimo
+(que corrige à mão) a deixar passar um facto que não está no perfil.
 
-A pontuação de compatibilidade mede a adequação do perfil aos requisitos da vaga. **Não é uma
-probabilidade de contratação.** Dimensões sem informação na vaga ficam de fora da ponderação, em vez de
-receberem um valor neutro arbitrário. Requisito sem evidência válida no perfil conta como não cumprido.
+A pontuação mede a adequação do perfil aos requisitos da vaga. **Não é uma probabilidade de
+contratação.** Dimensões sem informação na vaga saem da ponderação; um requisito sem evidência válida
+no perfil conta como não cumprido.
 
 ## Testes
 
 ```bash
-python -m pytest
+npm install     # só para os testes (linkedom e docx)
+npm test        # 92 testes, sem rede
 ```
 
-94 testes automáticos, sem rede nem Gmail real: validador do M4 (incluindo um teste de propriedade
-que insere números aleatórios em todos os itens do perfil e verifica que são sempre bloqueados),
-parsers e deduplicação, organização do Gmail com um serviço simulado (idempotência), perfil-base,
-compatibilidade, aprovação/exportação e tracker.
+Cobrem o validador do M4 (incluindo um teste de propriedade que insere números aleatórios em todos os
+itens do perfil e confirma que são sempre bloqueados), parsers e deduplicação, organização do Gmail com
+uma API simulada (idempotência), perfil-base, compatibilidade, aprovação/exportação e tracker.
+Correm também automaticamente no GitHub a cada envio (`.github/workflows/testes.yml`).
 
-## Estado das fases e o que falta validar com dados reais
+## Limitações conhecidas
 
-| Fase | Código e testes | Validação que só pode ser feita por si |
-|---|---|---|
-| 1. Gmail (M0) | ✅ | Confirmar que um alerta novo vai direto para `Vagas/<fonte>` |
-| 2. Recolha (M1) | ✅ | **Parsers calibrados apenas com e-mails sintéticos.** Ler uma semana de alertas reais; e-mails não reconhecidos aparecem na página Vagas e em `logs/emails_nao_reconhecidos.log`. Ajustes de padrões em `parsers.padroes_link_extra`. |
-| 3. Perfil-base (M2) | ✅ | Importar o seu CV, rever e validar |
-| 4. Compatibilidade (M3) | ✅ | O caminho com Ollama foi testado com respostas simuladas, não com um modelo real. Comparar 10 vagas reais com a sua avaliação manual e ajustar os pesos. |
-| 5. Otimizador de CV (M4) | ✅ critério cumprido | Rever a qualidade da reformulação do modelo no seu hardware |
-| 6. Tracker (M5) | ✅ | — |
+- **Parsers testados só com e-mails sintéticos.** Falta validar com uma semana de alertas reais. Os
+  e-mails não reconhecidos aparecem na lista de Vagas; padrões novos acrescentam-se nas Definições.
+- **O caminho com Ollama foi testado com respostas simuladas**, não com um modelo real.
+- As áreas e localizações-alvo são os exemplos da especificação: confirme-as nas Definições.
 
 ## Estrutura
 
 ```
-jobs/
-├── app.py                  # entrada Streamlit (navegação e página Início)
-├── pages/                  # Vagas, Detalhe da vaga, Revisão de CV, Tracker, Perfil-base, Definições
-├── src/
-│   ├── gmail/              # auth.py, organizacao.py (M0), recolha.py (M1)
-│   ├── parsers/            # base.py, fontes.py (um parser por fonte), normalizacao.py (dedup)
-│   ├── perfil/             # modelo.py (pydantic), versoes.py, extracao.py (M2)
-│   ├── compatibilidade/    # schemas.py, regras.py (fallback), motor.py (grelha e corte) (M3)
-│   ├── cv/                 # schemas, validador, gerador, diff, render, exportacao, fluxo (M4)
-│   ├── tracker/            # estados.py, metricas.py (M5)
-│   ├── llm.py              # cliente Ollama com saída JSON validada
-│   ├── config.py · db.py · texto.py · ui.py
-├── templates/              # cv_modelo.docx + criar_modelo.py
-├── tests/                  # pytest (fixtures sintéticas e perfil fictício)
-├── config.yaml · setup_gmail.py · requirements.txt · SPEC.md
-└── data/ · logs/           # locais, fora do repositório
+index.html  manifest.webmanifest  sw.js        App, instalação e modo offline
+shared/     ui.js store.js sync.js base.css   Base copiada das apps Vida OS
+css/app.css                                   Estilos próprios
+js/         config texto perfil parsers dados recolha gmail llm compat validador cv tracker
+js/ecras/   vagas vaga cv tracker perfil definicoes comum   (ecrãs)
+icons/      jobs.svg + PNG para iPhone/Android
+tests/      node --test (fixtures sintéticas e perfil fictício)
 ```

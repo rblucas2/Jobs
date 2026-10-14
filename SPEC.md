@@ -2,6 +2,11 @@
 
 14/10/2026 · @Rodrigo
 
+> **Adaptação (14/10/2026):** a pedido do Rodrigo, a ferramenta foi feita como app web instalável
+> (PWA), ao estilo das apps Vida OS, para funcionar no telemóvel e no PC sempre sincronizada.
+> As regras de fundo mantêm-se; as diferenças face à stack original estão na secção
+> “Adaptações para app web”, no fim deste documento.
+
 ## Objetivo e âmbito
 
 Uma aplicação local e gratuita que recolhe vagas dos alertas de emprego no Gmail, as ordena pela compatibilidade com o meu perfil, gera CVs adaptados apenas com dados reais e regista todas as candidaturas. A submissão das candidaturas é sempre manual.
@@ -206,3 +211,17 @@ procura-emprego/
 - [ ] CV atual em PDF ou Word, para gerar o perfil-base.
 - [ ] Modelo de CV em Word (o formato final) aprovado.
 - [ ] Projeto no Google Cloud com a Gmail API ativa e credenciais OAuth de "aplicação de ambiente de trabalho" (gratuito).
+
+## Adaptações para app web (PWA)
+
+| Especificação original | Na app web | Porquê / efeito |
+|---|---|---|
+| Python + Streamlit, local | HTML/CSS/JS (sem servidor), GitHub Pages, instalável | Funciona no telemóvel e no PC, como as apps Vida OS |
+| SQLite (4 tabelas) | Mesmas entidades (vagas, análises, CVs, candidaturas) guardadas no dispositivo | A candidatura fica junto da vaga (relação 1:1) |
+| Privacidade: tudo só no computador | Dados no dispositivo **e** no Supabase do próprio utilizador | Necessário para a sincronização; continua a não haver dados no repositório |
+| `setup_gmail.py` + `credentials.json`/`token.json` | Botões nas Definições; OAuth no browser (Google Identity Services) | Sem ficheiros de credenciais; a autorização dura ~1 h e é pedida de novo quando preciso |
+| Ollama sempre disponível | Ollama opcional e só no PC (`OLLAMA_ORIGINS`); no telemóvel, modo por regras | Um modelo de 7–8B não corre no telemóvel |
+| Modelo Word (`cv_modelo.docx`) + LibreOffice para PDF | Formato fixo, aprovado uma vez nas Definições; Word gerado no browser; PDF pela impressão do browser | Sem software instalado e igual no telemóvel e no PC |
+| `perfil_base_vN.yaml` | Versões do perfil na app, com editor por formulário e IDs estáveis | Mesmas regras: só a versão validada é usada; a validada é imutável |
+| `logs/emails_nao_reconhecidos.log` | Lista “E-mails não reconhecidos” no ecrã Vagas | Nunca falha em silêncio |
+| `config.yaml` | Definições na app (sincronizadas) | Mesmos parâmetros e valores por defeito |
