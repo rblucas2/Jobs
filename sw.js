@@ -1,11 +1,11 @@
 /* Service worker — app shell offline (mesma estratégia das apps Vida OS: network-first). */
-const VERSION = "jobs-v1";
+const VERSION = "jobs-v2";
 const CORE = [
   "./", "./index.html", "./manifest.webmanifest", "./icons/jobs.svg", "./icons/icon-180.png", "./icons/icon-192.png", "./icons/icon-512.png",
-  "./shared/base.css", "./shared/ui.js", "./shared/store.js", "./shared/sync.js", "./css/app.css",
+  "./shared/ui.js", "./shared/store.js", "./shared/sync.js", "./css/app.css",
   "./js/app.js", "./js/config.js", "./js/texto.js", "./js/perfil.js", "./js/parsers.js", "./js/dados.js", "./js/recolha.js",
   "./js/gmail.js", "./js/llm.js", "./js/compat.js", "./js/validador.js", "./js/cv.js", "./js/tracker.js",
-  "./js/ecras/comum.js", "./js/ecras/vagas.js", "./js/ecras/vaga.js", "./js/ecras/cv.js", "./js/ecras/tracker.js",
+  "./js/ecras/comum.js", "./js/ecras/inicio.js", "./js/ecras/vagas.js", "./js/ecras/vaga.js", "./js/ecras/cv.js", "./js/ecras/pipeline.js",
   "./js/ecras/perfil.js", "./js/ecras/definicoes.js",
 ];
 

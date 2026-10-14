@@ -8,6 +8,14 @@ Especificação: [SPEC.md](SPEC.md) (inclui as adaptações feitas para o format
 
 Tudo é HTML/CSS/JS puro, sem servidor próprio e sem custos.
 
+## Design
+
+Inspirado nos trackers de candidaturas mais usados (Huntr, Teal) e em plataformas de emprego
+(Otta / Welcome to the Jungle): painel inicial em grelha, cartões de vaga com as iniciais da empresa e
+um indicador circular da compatibilidade, pipeline em Kanban (arrastar e largar no PC), navegação
+inferior no telemóvel e barra lateral no PC, com a lista e o detalhe lado a lado. Modo claro e escuro,
+ícones [Lucide](https://lucide.dev) (licença ISC) e tipografia Plus Jakarta Sans.
+
 ## Pôr online (GitHub Pages)
 
 1. **O repositório tem de ser público** para o GitHub Pages ser gratuito (num repositório privado
@@ -67,12 +75,12 @@ dispositivos na rede local.
 ## Fluxo diário (≈15 min)
 
 1. Os alertas chegam ao Gmail e o filtro envia-os para `Vagas/*`, fora da caixa de entrada.
-2. **Vagas** → *Recolher do Gmail*: lê, deduplica, guarda e pontua (preliminar, com borda tracejada).
+2. **Início** ou **Vagas** → *Recolher do Gmail*: lê, deduplica, guarda e pontua (preliminar = anel tracejado).
 3. Numa vaga de interesse, **Vaga** → cole a descrição completa → *Guardar e analisar*.
 4. *Gerar CV adaptado* → **CV**: original vs. adaptado, origem de cada ponto, pontos não verificados
    bloqueados. Edite, confirme e aprove; descarregue o Word ou o PDF.
 5. Candidate-se **manualmente** na plataforma.
-6. **Tracker** → marque *Candidatado*; o follow-up fica agendado (10 dias por defeito). Exporte o CSV
+6. **Pipeline** → arraste a vaga para *Candidatado* (ou toque no cartão); o follow-up fica agendado (10 dias por defeito). Exporte o CSV
    para o Power BI quando quiser.
 
 ## Como a app garante dados reais no CV
@@ -121,10 +129,10 @@ Correm também automaticamente no GitHub a cada envio (`.github/workflows/testes
 
 ```
 index.html  manifest.webmanifest  sw.js        App, instalação e modo offline
-shared/     ui.js store.js sync.js base.css   Base copiada das apps Vida OS
-css/app.css                                   Estilos próprios
+shared/     ui.js store.js sync.js            Base copiada das apps Vida OS (dados e sincronização)
+css/app.css                                   Sistema de design da app
 js/         config texto perfil parsers dados recolha gmail llm compat validador cv tracker
-js/ecras/   vagas vaga cv tracker perfil definicoes comum   (ecrãs)
+js/ecras/   inicio vagas vaga pipeline cv perfil definicoes comum   (ecrãs)
 icons/      jobs.svg + PNG para iPhone/Android
 tests/      node --test (fixtures sintéticas e perfil fictício)
 ```
