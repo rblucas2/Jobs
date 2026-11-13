@@ -1,5 +1,5 @@
 /* Service worker — app shell offline (mesma estratégia das apps Vida OS: network-first). */
-const VERSION = "jobs-v2";
+const VERSION = "jobs-v3";
 const CORE = [
   "./", "./index.html", "./manifest.webmanifest", "./icons/jobs.svg", "./icons/icon-180.png", "./icons/icon-192.png", "./icons/icon-512.png",
   "./shared/ui.js", "./shared/store.js", "./shared/sync.js", "./css/app.css",

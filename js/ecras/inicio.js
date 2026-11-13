@@ -56,26 +56,34 @@ export function vistaInicio() {
     el("div", { class: "legend" }, [tracker.POR_CANDIDATAR, tracker.CANDIDATADO, tracker.ENTREVISTA, tracker.OFERTA, tracker.REJEITADO, tracker.DESCARTADA].map((s) => el("span", {}, [el("i", { class: "dot", style: `background:${FASES[s].cor}` }), `${FASES[s].curto} ${m.por_estado[s]}`]))),
   ], { icone: "kanban", acoes: [botao("Abrir", () => irPara("pipeline"), "btn btn-sm btn-ghost", { icone: "right" })], class: "span-2" });
 
-  const corpo = el("div", { class: "stack" }, [
-    el("div", { class: "bento" }, [
-      hero,
-      el("div", { class: "span-2", style: "display:grid;gap:14px" }, [
-        el("div", { class: "kpis", style: "grid-template-columns:repeat(2,1fr)" }, [
-          kpi("briefcase", "Vagas ativas", ativas.length, `${m.por_estado[tracker.POR_CANDIDATAR]} por candidatar`),
-          kpi("send", "Candidaturas", m.candidaturas, `${m.aguardam_resposta} a aguardar resposta`),
-          kpi("trend", "Taxa de resposta", m.taxa_resposta == null ? "—" : Math.round(m.taxa_resposta * 100) + "%", "entrevista, rejeição ou oferta"),
-          kpi("chat", "Entrevistas", m.entrevistas, `${m.por_estado.Oferta} oferta(s)`),
-        ]),
-      ]),
-      card("Próximos passos", passos.length ? [el("div", {}, passos)] : [el("div", { class: "empty", text: "Tudo em dia." })], { icone: "check", class: "span-2", sub: passos.length ? `${passos.length} por fazer` : "" }),
-      card("Melhores correspondências", top.length ? [el("div", { class: "jobs", style: "margin:0 -18px -18px" }, top.map((v) => el("div", { class: "job", onclick: () => irPara("vaga", { vagaId: v.id }) }, [
-        avatar(v.empresa || v.cargo), el("div", { class: "grow" }, [el("div", { class: "t", text: v.cargo }), el("div", { class: "m", text: [v.empresa, v.localizacao].filter(Boolean).join(" · ") })]),
-        gauge(v.pontuacao_global, { tam: 40, preliminar: v.preliminar }),
-      ])))] : [el("div", { class: "empty", text: perfil ? "Ainda não há vagas pontuadas por candidatar." : "Valide o perfil para pontuar as vagas." })],
-      { icone: "target", class: "span-2", acoes: [botao("Ver todas", () => irPara("vagas"), "btn btn-sm btn-ghost", { icone: "right" })] }),
-      funil,
+  // Sem vagas nem candidaturas, os indicadores e o pipeline só mostrariam zeros: fica o essencial (o que fazer a seguir).
+  const vazio = !vagas.length && !m.candidaturas;
+
+  const kpis = el("div", { class: "span-2", style: "display:grid;gap:14px" }, [
+    el("div", { class: "kpis", style: "grid-template-columns:repeat(2,1fr)" }, [
+      kpi("briefcase", "Vagas ativas", ativas.length, `${m.por_estado[tracker.POR_CANDIDATAR]} por candidatar`),
+      kpi("send", "Candidaturas", m.candidaturas, `${m.aguardam_resposta} a aguardar resposta`),
+      kpi("trend", "Taxa de resposta", m.taxa_resposta == null ? "—" : Math.round(m.taxa_resposta * 100) + "%", "entrevista, rejeição ou oferta"),
+      kpi("chat", "Entrevistas", m.entrevistas, `${m.por_estado.Oferta} oferta(s)`),
     ]),
-    el("p", { class: "tiny faint center", style: "margin-top:4px", text: "A pontuação mede a adequação do perfil aos requisitos da vaga. Não é uma probabilidade de contratação." }),
+  ]);
+  const proximos = card("Próximos passos", passos.length ? [el("div", {}, passos)] : [el("div", { class: "empty", text: "Tudo em dia." })], { icone: "check", class: "span-2", sub: passos.length ? `${passos.length} por fazer` : "" });
+  const melhores = card("Melhores correspondências", top.length ? [el("div", { class: "jobs", style: "margin:0 -18px -18px" }, top.map((v) => el("div", { class: "job", onclick: () => irPara("vaga", { vagaId: v.id }) }, [
+    avatar(v.empresa || v.cargo), el("div", { class: "grow" }, [el("div", { class: "t", text: v.cargo }), el("div", { class: "m", text: [v.empresa, v.localizacao].filter(Boolean).join(" · ") })]),
+    gauge(v.pontuacao_global, { tam: 40, preliminar: v.preliminar }),
+  ])))] : [el("div", { class: "empty", text: perfil ? "Ainda não há vagas pontuadas por candidatar." : "Valide o perfil para pontuar as vagas." })],
+  { icone: "target", class: "span-2", acoes: [botao("Ver todas", () => irPara("vagas"), "btn btn-sm btn-ghost", { icone: "right" })] });
+
+  // Com passos pendentes, a ação vem antes dos números.
+  const blocos = vazio
+    ? [hero, proximos]
+    : passos.length ? [hero, proximos, kpis, melhores, funil] : [hero, kpis, melhores, proximos, funil];
+
+  const corpo = el("div", { class: "stack" }, [
+    el("div", { class: "bento" }, blocos),
+    vazio
+      ? el("p", { class: "tiny faint center", style: "margin-top:4px", text: "Os indicadores e o pipeline aparecem aqui assim que houver vagas." })
+      : el("p", { class: "tiny faint center", style: "margin-top:4px", text: "A pontuação mede a adequação do perfil aos requisitos da vaga. Não é uma probabilidade de contratação." }),
   ]);
   return { titulo: "Início", sub: null, corpo };
 }
